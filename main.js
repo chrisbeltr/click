@@ -5,7 +5,7 @@ const base62 = require("base62/lib/ascii");
 const crypto = require("crypto");
 const Firestore = require("@google-cloud/firestore");
 
-let PORT = 6382;
+let PORT = 443;
 
 const db = new Firestore({
   projectId: "cummy-bot",
@@ -42,7 +42,7 @@ app.post("/:link", async (req, res, next) => {
   let d;
   while ((d = await get(hashed())).exists != false) len++;
   d.ref.create({ type: "link", link: req.params.link });
-  res.send(`http://localhost:6382/${d.id}`);
+  res.send(`https://borks.click/${d.id}`);
 });
 
 app.get("/:id", async (req, res, next) => {
@@ -73,7 +73,7 @@ function retry(err) {
     PORT++;
     app.listen(PORT, retry);
   } else {
-    console.log(`wistening at http://localhost:${PORT}`);
+    console.log(`wistening at https://borks.dev:${PORT}`);
   }
 }
 app.listen(PORT, retry);
