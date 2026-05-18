@@ -2,33 +2,105 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>borks link shortener</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0"
+    />
+    <title>borks link shortener™</title>
+    <style>
+      *,
+      *::after,
+      *::before {
+        box-sizing: border-box;
+      }
+
+      html {
+        height: 100%;
+      }
+
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 7px;
+        background-color: #bbe4f9;
+      }
+
+      .page {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .container {
+        padding: 7px;
+        border: 1px solid black;
+      }
+
+      h1,
+      p {
+        margin: 7px 0;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      label {
+        font-weight: bold;
+        align-self: flex-start;
+      }
+    </style>
   </head>
   <body>
-    <h1>borks.click</h1>
-    <form id="form" action="">
-      <label for="input">link/text</label><br />
-      <input type="text" name="input" id="input" placeholder="links must start with http(s)://"/><br />
-      <input type="submit" value="submit" />
-    </form>
-    <span id="response"></span>
+    <div class="page">
+      <div class="container">
+        <h1>borks.click</h1>
+        <p>
+          want to shorten a link? want to store some text? go ahead, put it in
+          the textbox below, and we'll give you back a link you can share!
+          please don't put anything important or personal in here. or do, i
+          can't stop you :3
+        </p>
+        <form id="form" action="">
+          <label for="input">link/text</label>
+          <input
+            type="text"
+            name="input"
+            id="input"
+            placeholder="links must start with http(s)://"
+            required
+          />
+          <input type="submit" value="submit" />
+        </form>
+        <span id="response"></span>
+      </div>
+      <footer>
+        made with love by <a href="https://borks.click/2940qU">borks</a> |
+        <a href="https://borks.click/4J0aZh">github</a>
+      </footer>
+    </div>
     <script>
       let form = document.getElementById("form");
+      let input = document.getElementById("input");
       let response = document.getElementById("response");
       form.addEventListener("submit", async (ev) => {
         ev.preventDefault();
 
         let data = new FormData(form);
         let url = encodeURIComponent(data.get("input"));
-        form.reset();
+        input.disabled = true;
 
         let res = await fetch(`./${url}`, { method: "POST" });
-        let link = await res.text();
-        if (link == "something went wrong") {
+        if (res.status != 200 && res.status != 302) {
           response.innerHTML = "something went wrong";
           return;
         }
+        let link = await res.text();
+        input.disabled = false;
+        form.reset();
         response.innerHTML = `your new link: <a href="${link}" target="_blank">${link}</a>`;
       });
     </script>
