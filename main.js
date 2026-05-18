@@ -1,16 +1,79 @@
-const Firestore = require('@google-cloud/firestore');
+const express = require("express");
+const http = require("node:http");
+const fs = require("node:fs");
+const base62 = require("base62/lib/ascii");
+const crypto = require("crypto");
+const Firestore = require("@google-cloud/firestore");
+
+let PORT = 6382;
 
 const db = new Firestore({
-  projectId: 'cummy-bot',
-  keyFilename: 'key.json',
+  projectId: "cummy-bot",
+  keyFilename: "key.json",
 });
 
-async function get() {
-	const snapshot = await db.collection('test').get();
-	console.log("um");
-	snapshot.forEach((doc) => {
-	  console.log(doc.id, '=>', doc.data());
-	});
+const click = db.collection("click");
+
+async function get(id) {
+  return await db.collection("test").doc(id).get();
 }
 
-setTimeout(get, 0);
+let app = express();
+app.set("case sensitive routing", true);
+
+app.get("/", (req, res) => {
+  res.sendFile("/index.html", { root: "." });
+});
+
+app.post("/:link", async (req, res, next) => {
+  let len = 6;
+  const hashed = () =>
+    base62
+      .encode(
+        parseInt(
+          crypto
+            .createHash("md5")
+            .update(req.params.link + crypto.randomUUID(), "utf8")
+            .digest("hex"),
+          16,
+        ),
+      )
+      .slice(0, len);
+  let d;
+  while ((d = await get(hashed())).exists != false) len++;
+  d.ref.create({ type: "link", link: req.params.link });
+  res.send(`http://localhost:6382/${d.id}`);
+});
+
+app.get("/:id", async (req, res, next) => {
+  let d;
+  if (
+    req.params.id.length < 6 ||
+    (d = await get(req.params.id)).exists == false
+  ) {
+    let err = new Error();
+    err.code = "INVALID";
+    next(err);
+    return;
+  }
+  res.redirect(302, d.get("link"));
+});
+
+app.use("/:id", (err, req, res, next) => {
+  if (err.code == "INVALID")
+    res.status(404).send(`invalid id ${req.params.id}`);
+  else {
+    res.status(500).send("something went wrong");
+    console.log(err);
+  }
+});
+
+function retry(err) {
+  if (err && err.code == "EADDRINUSE") {
+    PORT++;
+    app.listen(PORT, retry);
+  } else {
+    console.log(`wistening at http://localhost:${PORT}`);
+  }
+}
+app.listen(PORT, retry);
