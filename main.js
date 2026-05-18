@@ -75,7 +75,11 @@ app.use("/:id", (err, req, res, next) => {
 //   } else {
 //   }
 // }
-let server = https.createServer(app);
+const cert = {
+  key: fs.readFileSync("cert/private.key.pem"),
+  cert: fs.readFileSync("cert/domain.cert.pem"),
+};
+let server = https.createServer(cert, app);
 server.listen(PORT);
 server.on("error", (err) => {
   if (err.code == "EADDRINUSE") {
