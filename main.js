@@ -15,7 +15,7 @@ const db = new Firestore({
 const click = db.collection("click");
 
 async function get(id) {
-  return await db.collection("test").doc(id).get();
+  return await db.collection("links").doc(id).get();
 }
 
 let app = express();
