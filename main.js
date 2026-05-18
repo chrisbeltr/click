@@ -3,6 +3,7 @@ const https = require("node:https");
 const fs = require("node:fs");
 const base62 = require("base62/lib/ascii");
 const crypto = require("crypto");
+const RE2 = require("re2");
 const Firestore = require("@google-cloud/firestore");
 
 let PORT = 443;
@@ -18,6 +19,10 @@ async function get(id) {
   return await db.collection("links").doc(id).get();
 }
 
+const link_reg = new RE2(
+  "https?:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,})|([0-9]{1,4}(\.[0-9]{1,4}){3}))(:[0-9]{1,5})?(\/[-a-zA-Z0-9@%_+~#?&\/= ]*)*",
+);
+
 let app = express();
 app.set("case sensitive routing", true);
 
@@ -25,7 +30,7 @@ app.get("/", (req, res) => {
   res.sendFile("/index.html", { root: "." });
 });
 
-app.post("/:link", async (req, res, next) => {
+app.post("/:input", async (req, res, next) => {
   let len = 6;
   const hashed = () =>
     base62
@@ -33,7 +38,7 @@ app.post("/:link", async (req, res, next) => {
         parseInt(
           crypto
             .createHash("md5")
-            .update(req.params.link + crypto.randomUUID(), "utf8")
+            .update(req.params.input + crypto.randomUUID(), "utf8")
             .digest("hex"),
           16,
         ),
@@ -41,7 +46,9 @@ app.post("/:link", async (req, res, next) => {
       .slice(0, len);
   let d;
   while ((d = await get(hashed())).exists != false) len++;
-  d.ref.create({ type: "link", link: req.params.link });
+  if (link_reg.test(decodeURIComponent(req.params.input)))
+    d.ref.create({ type: "link", link: req.params.input });
+  else d.ref.create({ type: "text", text: req.params.input });
   res.send(`https://borks.click/${d.id}`);
 });
 
@@ -56,7 +63,11 @@ app.get("/:id", async (req, res, next) => {
     next(err);
     return;
   }
-  res.redirect(302, d.get("link"));
+  let type = d.get("type");
+  if (type == "link") {
+    res.redirect(302, d.get("link"));
+    console.log("link!!");
+  } else if (type == "text") res.status(200).send(d.get("text"));
 });
 
 app.use("/:id", (err, req, res, next) => {
