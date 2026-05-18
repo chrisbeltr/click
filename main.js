@@ -1,5 +1,5 @@
 const express = require("express");
-const http = require("node:http");
+const https = require("node:https");
 const fs = require("node:fs");
 const base62 = require("base62/lib/ascii");
 const crypto = require("crypto");
@@ -68,12 +68,23 @@ app.use("/:id", (err, req, res, next) => {
   }
 });
 
-function retry(err) {
-  if (err && err.code == "EADDRINUSE") {
+// function retry(err) {
+//   if (err && err.code == "EADDRINUSE") {
+//     PORT++;
+//     app.listen(PORT, retry);
+//   } else {
+//   }
+// }
+let server = https.createServer(app);
+server.listen(PORT);
+server.on("error", (err) => {
+  if (err.code == "EADDRINUSE") {
     PORT++;
-    app.listen(PORT, retry);
+    server.listen(PORT);
   } else {
-    console.log(`wistening at https://borks.dev:${PORT}`);
+    console.log(err);
   }
-}
-app.listen(PORT, retry);
+});
+server.on("listening", () =>
+  console.log(`wistening at https://borks.click:${PORT}`),
+);
