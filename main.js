@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const base62 = require("base62/lib/ascii");
 const crypto = require("crypto");
 const RE2 = require("re2");
+const escape = require("escape-html");
 const Firestore = require("@google-cloud/firestore");
 
 let PORT = 443;
@@ -31,6 +32,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/:input", async (req, res, next) => {
+  let input = escape(req.params.input);
   let len = 6;
   const hashed = () =>
     base62
@@ -38,7 +40,7 @@ app.post("/:input", async (req, res, next) => {
         parseInt(
           crypto
             .createHash("md5")
-            .update(req.params.input + crypto.randomUUID(), "utf8")
+            .update(input + crypto.randomUUID(), "utf8")
             .digest("hex"),
           16,
         ),
@@ -46,18 +48,16 @@ app.post("/:input", async (req, res, next) => {
       .slice(0, len);
   let d;
   while ((d = await get(hashed())).exists != false) len++;
-  if (link_reg.test(decodeURIComponent(req.params.input)))
-    d.ref.create({ type: "link", link: req.params.input });
-  else d.ref.create({ type: "text", text: req.params.input });
+  if (link_reg.test(decodeURIComponent(input)))
+    d.ref.create({ type: "link", link: input });
+  else d.ref.create({ type: "text", text: input });
   res.set("Content-Type", "text/plain").status(200).send(`https://borks.click/${d.id}`);
 });
 
 app.get("/:id", async (req, res, next) => {
+  let id = escape(req.params.id);
   let d;
-  if (
-    req.params.id.length < 6 ||
-    (d = await get(req.params.id)).exists == false
-  ) {
+  if (id.length < 6 || (d = await get(id)).exists == false) {
     let err = new Error();
     err.code = "INVALID";
     next(err);
@@ -72,8 +72,9 @@ app.get("/:id", async (req, res, next) => {
 });
 
 app.use("/:id", (err, req, res, next) => {
+  let id = escape(req.params.id);
   if (err.code == "INVALID")
-    res.status(404).send(`invalid id ${req.params.id}`);
+    res.status(404).send(`invalid id ${id}`);
   else {
     res.status(500).send("something went wrong");
     console.log(err);
