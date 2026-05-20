@@ -9,7 +9,7 @@ const Firestore = require("@google-cloud/firestore");
 let PORT = 443;
 
 const db = new Firestore({
-  projectId: "cummy-bot",
+  projectId: process.env.CLICK_PID,
   keyFilename: "key.json",
 });
 
