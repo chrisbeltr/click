@@ -49,7 +49,7 @@ app.post("/:input", async (req, res, next) => {
   if (link_reg.test(decodeURIComponent(req.params.input)))
     d.ref.create({ type: "link", link: req.params.input });
   else d.ref.create({ type: "text", text: req.params.input });
-  res.send(`https://borks.click/${d.id}`);
+  res.set("Content-Type", "text/plain").status(200).send(`https://borks.click/${d.id}`);
 });
 
 app.get("/:id", async (req, res, next) => {
