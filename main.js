@@ -67,7 +67,8 @@ app.get("/:id", async (req, res, next) => {
   if (type == "link") {
     res.redirect(302, d.get("link"));
     console.log("link!!");
-  } else if (type == "text") res.status(200).send(d.get("text"));
+  } else if (type == "text")
+    res.set("Content-Type", "text/plain").status(200).send(d.get("text"));
 });
 
 app.use("/:id", (err, req, res, next) => {
