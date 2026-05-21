@@ -97,17 +97,25 @@
 
         let data = new FormData(form);
         let url = encodeURIComponent(data.get("input"));
+        if (url.length > 2000) {
+          response.innerHTML = "input was too large!";
+          return;
+        }
+
         input.disabled = true;
 
         let res = await fetch(`./${url}`, { method: "POST" });
+        let output = await res.text();
+        input.disabled = false;
         if (res.status != 200 && res.status != 302) {
-          response.innerHTML = "something went wrong";
+          if (output)
+            response.innerHTML = output;
+          else
+            response.innerHTML = `${res.status}: ${res.statusText}`
           return;
         }
-        let link = await res.text();
-        input.disabled = false;
         form.reset();
-        response.innerHTML = `your new link: <a href="${link}" target="_blank">${link}</a>`;
+        response.innerHTML = `your new link: <a href="${output}" target="_blank">${output}</a>`;
       });
     </script>
   </body>

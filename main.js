@@ -32,6 +32,10 @@ app.get("/", (req, res) => {
 });
 
 app.post("/:input", async (req, res, next) => {
+  if (req.params.input.length > 2000) {
+    res.status(400).send("input was too large!");
+    return;
+  }
   let input = escape(req.params.input);
   let len = 6;
   const hashed = () =>
@@ -66,7 +70,6 @@ app.get("/:id", async (req, res, next) => {
   let type = d.get("type");
   if (type == "link") {
     res.redirect(302, d.get("link"));
-    console.log("link!!");
   } else if (type == "text")
     res.set("Content-Type", "text/plain").status(200).send(d.get("text"));
 });
