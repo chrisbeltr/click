@@ -115,7 +115,11 @@
           return;
         }
         form.reset();
-        response.innerHTML = `your new link: <a href="${output}" target="_blank">${output}</a>`;
+        response.innerHTML = `your new link: <a href="${output}" target="_blank">${output}</a>!`;
+        try {
+          await navigator.clipboard.writeText(output)
+          response.innerHTML += " it has been copied to your clipboard."
+        } catch {}
       });
     </script>
   </body>
