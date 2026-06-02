@@ -1,3 +1,6 @@
 node_modules/
 key.json
 cert/
+caddy
+run
+.run.swp
