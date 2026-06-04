@@ -1,0 +1,54 @@
+services:
+  click:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    pull_policy: build
+    image: click-node:latest
+    container_name: click
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file: .env
+    networks:
+      - backend
+    command: ["node", "main.js"]
+
+  qr:
+    image: click-node:latest
+    pull_policy: build
+    container_name: qr
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    env_file: .env
+    networks:
+      - backend
+    command: ["node", "qr.js"]
+
+  caddy:
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
+    pull_policy: build
+    container_name: caddy
+    restart: unless-stopped
+    depends_on:
+      - click
+      - qr
+    ports:
+      - "80:80"
+      - "443:443/tcp"
+      - "443:443/udp"
+    env_file: .env
+    networks:
+      - backend
+    volumes:
+      - caddy_data:/data
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  caddy_data:

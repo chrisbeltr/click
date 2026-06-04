@@ -1,0 +1,9 @@
+FROM node:24 AS node
+
+WORKDIR /web
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY main.js qr.js index.html key.json ./

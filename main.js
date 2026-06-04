@@ -1,5 +1,5 @@
 const express = require("express");
-const https = require("node:https");
+const http = require("node:http");
 const fs = require("node:fs");
 const base62 = require("base62/lib/ascii");
 const crypto = require("crypto");
@@ -7,7 +7,7 @@ const RE2 = require("re2");
 const escape = require("escape-html");
 const Firestore = require("@google-cloud/firestore");
 
-let PORT = 443;
+let PORT = 3000;
 
 const db = new Firestore({
   projectId: process.env.CLICK_PID,
@@ -55,7 +55,10 @@ app.post("/:input", async (req, res, next) => {
   if (link_reg.test(decodeURIComponent(input)))
     d.ref.create({ type: "link", link: input });
   else d.ref.create({ type: "text", text: input });
-  res.set("Content-Type", "text/plain").status(200).send(`https://borks.click/${d.id}`);
+  res
+    .set("Content-Type", "text/plain")
+    .status(200)
+    .send(`https://borks.click/${d.id}`);
 });
 
 app.get("/:id", async (req, res, next) => {
@@ -76,8 +79,7 @@ app.get("/:id", async (req, res, next) => {
 
 app.use("/:id", (err, req, res, next) => {
   let id = escape(req.params.id);
-  if (err.code == "INVALID")
-    res.status(404).send(`invalid id ${id}`);
+  if (err.code == "INVALID") res.status(404).send(`invalid id ${id}`);
   else {
     res.status(500).send("something went wrong");
     console.log(err);
@@ -91,11 +93,11 @@ app.use("/:id", (err, req, res, next) => {
 //   } else {
 //   }
 // }
-const cert = {
-  key: fs.readFileSync("cert/private.key.pem"),
-  cert: fs.readFileSync("cert/domain.cert.pem"),
-};
-let server = https.createServer(cert, app);
+// const cert = {
+//   key: fs.readFileSync("cert/private.key.pem"),
+//   cert: fs.readFileSync("cert/domain.cert.pem"),
+// };
+let server = http.createServer(app);
 server.listen(PORT);
 server.on("error", (err) => {
   if (err.code == "EADDRINUSE") {
@@ -105,6 +107,4 @@ server.on("error", (err) => {
     console.log(err);
   }
 });
-server.on("listening", () =>
-  console.log(`wistening at https://borks.click:${PORT}`),
-);
+server.on("listening", () => console.log(`listening on port ${PORT}`));
