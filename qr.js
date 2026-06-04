@@ -8,10 +8,19 @@ let app = express();
 app.set("case sensitive routing", true);
 
 app.get("/", (req, res) => {
-  res
-    .type("text/plain")
-    .status(200)
-    .end("shiiiiiiiiiiii we're fucking doneeeeeeeee");
+  res.redirect("https://borks.click");
+});
+
+app.get("/:id", (req, res) => {
+  let code = qr.toString(
+    `https://borks.click/${req.params.id}`,
+    {
+      type: "utf8",
+    },
+    (err, code) => {
+      res.type("text/plain").send(code);
+    },
+  );
 });
 
 let server = http.createServer(app);
