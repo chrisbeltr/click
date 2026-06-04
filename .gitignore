@@ -4,4 +4,4 @@ cert/
 caddy
 run
 .run.swp
-out.log
+.env
