@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.node
+      no_cache: true
     pull_policy: build
     image: click-node:latest
     container_name: click

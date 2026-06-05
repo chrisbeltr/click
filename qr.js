@@ -3,6 +3,12 @@ const http = require("node:http");
 const qr = require("qrcode");
 
 let PORT = 3001;
+let colors = [
+  { dark: "#000000ff", light: "#454647ff" },
+  { dark: "#ac6962ff", light: "#ffe482ff" },
+  { dark: "#450222ff", light: "#977bb7ff" },
+  { dark: "#bbe4f9ff", light: "#ffffffff" },
+];
 
 let app = express();
 app.set("case sensitive routing", true);
@@ -12,15 +18,12 @@ app.get("/", (req, res) => {
 });
 
 app.get("/:id", (req, res) => {
-  let code = qr.toString(
-    `https://borks.click/${req.params.id}`,
-    {
-      type: "utf8",
-    },
-    (err, code) => {
-      res.type("text/plain").send(code);
-    },
-  );
+  res.type("image/png");
+  qr.toFileStream(res, `https://borks.click/${req.params.id}`, {
+    scale: 12,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    margin: 1,
+  });
 });
 
 let server = http.createServer(app);
