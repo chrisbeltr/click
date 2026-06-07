@@ -53,8 +53,7 @@ app.post("/:input", async (req, res, next) => {
       .slice(0, len);
   let d;
   while ((d = await get(hashed())).exists != false) len++;
-  if (link_reg.test(decodeURIComponent(input)))
-    d.ref.create({ type: "link", link: input });
+  if (link_reg.test(input)) d.ref.create({ type: "link", link: input });
   else d.ref.create({ type: "text", text: input });
   res
     .set("Content-Type", "text/plain")
