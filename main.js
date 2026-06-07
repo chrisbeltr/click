@@ -36,7 +36,8 @@ app.post("/:input", async (req, res, next) => {
     res.status(400).send("input was too large!");
     return;
   }
-  let input = escape(req.params.input);
+  let input = decodeURIComponent(req.params.input);
+  let escaped = escape(input);
   let len = 6;
   const hashed = () =>
     base62
