@@ -12,7 +12,7 @@ let colors = {
   fall: { dark: "#450222ff", light: "#977bb7ff" },
 };
 
-const hex_regex = new RE2("^[0-9A-F]{8}$");
+const hex_regex = new RE2("^[0-9a-fA-F]{8}$");
 
 let app = express();
 app.set("case sensitive routing", true);
