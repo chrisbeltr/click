@@ -1,17 +1,23 @@
 const express = require("express");
 const http = require("node:http");
 const qr = require("qrcode");
+const RE2 = require("re2");
 
 let PORT = 3001;
-let colors = [
-  { dark: "#000000ff", light: "#454647ff" },
-  { dark: "#ac6962ff", light: "#ffe482ff" },
-  { dark: "#450222ff", light: "#977bb7ff" },
-  { dark: "#bbe4f9ff", light: "#ffffffff" },
-];
+let colors = {
+  default: { dark: "#000000ff", light: "#ffffffff" },
+  dark: { dark: "#000000ff", light: "#454647ff" },
+  light: { dark: "#bbe4f9ff", light: "#ffffffff" },
+  borks: { dark: "#ac6962ff", light: "#ffe482ff" },
+  fall: { dark: "#450222ff", light: "#977bb7ff" },
+};
+
+const hex_regex = new RE2("^[0-9A-F]{8}$");
 
 let app = express();
 app.set("case sensitive routing", true);
+
+app.set("query parser", (str) => new URLSearchParams(str));
 
 app.get("/", (req, res) => {
   if (req.host == "qr.brks.o") res.redirect("http://brks.o");
@@ -19,6 +25,23 @@ app.get("/", (req, res) => {
 });
 
 app.get("/:id", (req, res) => {
+  let color = colors.default;
+  let preset = req.query.get("preset");
+  let dark = req.query.get("dark");
+  let light = req.query.get("light");
+  if (preset != null) {
+    if (preset == "random") {
+      let cs = Object.values(colors);
+      color = cs[Math.floor(Math.random() * cs.length)];
+    } else {
+      let c = colors[preset];
+      if (c != undefined) {
+        color = c;
+      }
+    }
+  } else if (hex_regex.test(light) && hex_regex.test(dark)) {
+    color = { dark: `#${dark}`, light: `#${light}` };
+  }
   let prefer = req.get("Prefer");
   if (prefer && prefer.includes("terminal")) {
     res.type("text/plain");
@@ -28,7 +51,6 @@ app.get("/:id", (req, res) => {
         margin: 1,
         small: true,
         type: "terminal",
-        color: colors[Math.floor(Math.random() * colors.length)],
       },
       (err, code) => {
         res.send(code);
@@ -38,7 +60,7 @@ app.get("/:id", (req, res) => {
     res.type("image/png");
     qr.toFileStream(res, `${req.protocol}://${req.host}/${req.params.id}`, {
       scale: 12,
-      color: colors[Math.floor(Math.random() * colors.length)],
+      color: color,
       margin: 1,
     });
   }
