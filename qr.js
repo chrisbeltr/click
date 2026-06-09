@@ -18,12 +18,29 @@ app.get("/", (req, res) => {
 });
 
 app.get("/:id", (req, res) => {
-  res.type("image/png");
-  qr.toFileStream(res, `https://borks.click/${req.params.id}`, {
-    scale: 12,
-    color: colors[Math.floor(Math.random() * colors.length)],
-    margin: 1,
-  });
+  let prefer = req.get("Prefer");
+  if (prefer && prefer.includes("terminal")) {
+    res.type("text/plain");
+    qr.toString(
+      `https://borks.click/${req.params.id}`,
+      {
+        margin: 1,
+        small: true,
+        type: "terminal",
+        color: colors[Math.floor(Math.random() * colors.length)],
+      },
+      (err, code) => {
+        res.send(code);
+      },
+    );
+  } else {
+    res.type("image/png");
+    qr.toFileStream(res, `https://borks.click/${req.params.id}`, {
+      scale: 12,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      margin: 1,
+    });
+  }
 });
 
 let server = http.createServer(app);
