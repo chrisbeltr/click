@@ -1,13 +1,9 @@
-borks.click {
-	handle {
-		reverse_proxy http://click:3000
-	}
-
+(clicktls) {
 	tls {
 		issuer acme {
 			dns porkbun {
-				api_key {$PORKBUN_API_KEY}
-				api_secret_key {$PORKBUN_SECRET_KEY}
+				api_key {args[0]}
+				api_secret_key {args[1]}
 			}
 		}
 	}
@@ -15,19 +11,18 @@ borks.click {
 	tls ./cert/domain.cert.pem ./cert/private.key.pem
 }
 
+borks.click {
+	handle {
+		reverse_proxy http://click:3000
+	}
+
+	import clicktls {$PORKBUN_API_KEY} {$PORKBUN_SECRET_KEY}
+}
+
 qr.borks.click {
 	handle {
 		reverse_proxy http://qr:3001
 	}
 
-	tls {
-		issuer acme {
-			dns porkbun {
-				api_key {$PORKBUN_API_KEY}
-				api_secret_key {$PORKBUN_SECRET_KEY}
-			}
-		}
-	}
-
-	tls ./cert/domain.cert.pem ./cert/private.key.pem
+	import clicktls {$PORKBUN_API_KEY} {$PORKBUN_SECRET_KEY}
 }
