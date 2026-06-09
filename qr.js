@@ -46,7 +46,7 @@ app.get("/:id", (req, res) => {
   if (prefer && prefer.includes("terminal")) {
     res.type("text/plain");
     qr.toString(
-      `${req.protocol}://${req.host}/${req.params.id}`,
+      `${req.protocol}://${req.host.replace("qr.", "")}/${req.params.id}`,
       {
         margin: 1,
         small: true,
@@ -58,11 +58,15 @@ app.get("/:id", (req, res) => {
     );
   } else {
     res.type("image/png");
-    qr.toFileStream(res, `${req.protocol}://${req.host}/${req.params.id}`, {
-      scale: 12,
-      color: color,
-      margin: 1,
-    });
+    qr.toFileStream(
+      res,
+      `${req.protocol}://${req.host.replace("qr.", "")}/${req.params.id}`,
+      {
+        scale: 12,
+        color: color,
+        margin: 1,
+      },
+    );
   }
 });
 
