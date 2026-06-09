@@ -23,21 +23,18 @@ async function get(id) {
 const link_reg = new RE2(
   "^https?:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,})|([0-9]{1,3}(\.[0-9]{1,3}){3}))(:[0-9]{1,5})?(\/[-a-zA-Z0-9@%_+~#?&\/= ]*)*$",
 );
+const valid_name = new RE2("^[0-9a-zA-Z]{6,}$");
 
 let app = express();
 app.set("case sensitive routing", true);
+
+app.use(express.json({ type: "application/json" }));
 
 app.get("/", (req, res) => {
   res.sendFile("/index.html", { root: "." });
 });
 
-app.post("/:input", async (req, res, next) => {
-  if (req.params.input.length > 2000) {
-    res.status(400).send("input was too large!");
-    return;
-  }
-  let input = decodeURIComponent(req.params.input);
-  let escaped = escape(input);
+app.post("/", async (req, res) => {
   let len = 6;
   const hashed = () =>
     base62
@@ -51,14 +48,33 @@ app.post("/:input", async (req, res, next) => {
         ),
       )
       .slice(0, len);
-  let d;
-  while ((d = await get(hashed())).exists != false) len++;
-  if (link_reg.test(input)) d.ref.create({ type: "link", link: input });
-  else d.ref.create({ type: "text", text: input });
+  let name = req.body["name"];
+  let input = req.body["input"];
+  if (input == undefined) {
+    res.status(400).send("needs to have some input.");
+    return;
+  }
+  let doc;
+  if (name == undefined) {
+    do {
+      name = hashed();
+      len++;
+    } while ((doc = await get(name)).exists != false);
+  } else {
+    doc = await get(name);
+    if (valid_name.test(name) == false || doc.exists != false) {
+      res.status(400).send("invalid link name, please choose another name.");
+      return;
+    }
+  }
+  if (link_reg.test(input)) doc.ref.create({ type: "link", link: input });
+  else doc.ref.create({ type: "text", text: input });
   res
     .set("Content-Type", "text/plain")
     .status(200)
-    .send(`${req.protocol}://${req.host}/${d.id}`);
+    .send(
+      `${req.host == "borks.click" ? "https" : "http"}://${req.host}/${name}`,
+    );
 });
 
 app.get("/:id", async (req, res, next) => {

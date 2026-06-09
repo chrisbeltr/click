@@ -71,6 +71,14 @@
           can't stop you :3
         </p>
         <form id="form" action="">
+          <label for="name">custom link name</label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="6 or more, no spaces/symbols, blank for random"
+            minlength="6"
+          />
           <label for="input">link/text</label>
           <input
             type="text"
@@ -91,22 +99,26 @@
     <script>
       let form = document.getElementById("form");
       let input = document.getElementById("input");
+      let name = document.getElementById("name");
       let response = document.getElementById("response");
       form.addEventListener("submit", async (ev) => {
         ev.preventDefault();
 
         let data = new FormData(form);
-        let url = encodeURIComponent(data.get("input"));
+        let url = data.get("input");
         if (url.length > 2000) {
           response.innerHTML = "input was too large!";
           return;
         }
+        let custom = data.get("name");
 
         input.disabled = true;
+        name.disabled = true;
 
-        let res = await fetch(`./${url}`, { method: "POST" });
+        let res = await fetch("./", { method: "POST", body: JSON.stringify({ input: url, name: custom }), headers: {"Content-Type": "application/json" } });
         let output = await res.text();
         input.disabled = false;
+        name.disabled = false;
         if (res.status != 200 && res.status != 302) {
           if (output)
             response.innerHTML = output;
