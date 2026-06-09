@@ -58,7 +58,7 @@ app.post("/:input", async (req, res, next) => {
   res
     .set("Content-Type", "text/plain")
     .status(200)
-    .send(`https://borks.click/${d.id}`);
+    .send(`${req.protocol}://${req.host}/${d.id}`);
 });
 
 app.get("/:id", async (req, res, next) => {

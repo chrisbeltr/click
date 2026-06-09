@@ -14,7 +14,8 @@ let app = express();
 app.set("case sensitive routing", true);
 
 app.get("/", (req, res) => {
-  res.redirect("https://borks.click");
+  if (req.host == "qr.brks.o") res.redirect("http://brks.o");
+  else res.redirect("https://borks.click");
 });
 
 app.get("/:id", (req, res) => {
@@ -22,7 +23,7 @@ app.get("/:id", (req, res) => {
   if (prefer && prefer.includes("terminal")) {
     res.type("text/plain");
     qr.toString(
-      `https://borks.click/${req.params.id}`,
+      `${req.protocol}://${req.host}/${req.params.id}`,
       {
         margin: 1,
         small: true,
@@ -35,7 +36,7 @@ app.get("/:id", (req, res) => {
     );
   } else {
     res.type("image/png");
-    qr.toFileStream(res, `https://borks.click/${req.params.id}`, {
+    qr.toFileStream(res, `${req.protocol}://${req.host}/${req.params.id}`, {
       scale: 12,
       color: colors[Math.floor(Math.random() * colors.length)],
       margin: 1,

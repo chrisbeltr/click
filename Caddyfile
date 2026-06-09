@@ -12,17 +12,21 @@
 }
 
 borks.click {
-	handle {
-		reverse_proxy http://click:3000
-	}
+	reverse_proxy http://click:3000
 
 	import clicktls {$PORKBUN_API_KEY} {$PORKBUN_SECRET_KEY}
 }
 
 qr.borks.click {
-	handle {
-		reverse_proxy http://qr:3001
-	}
+	reverse_proxy http://qr:3001
 
 	import clicktls {$PORKBUN_API_KEY} {$PORKBUN_SECRET_KEY}
+}
+
+http://brks.o {
+	reverse_proxy http://click:3000
+}
+
+http://qr.brks.o {
+	reverse_proxy http://qr:3001
 }
