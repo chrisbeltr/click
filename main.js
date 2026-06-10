@@ -50,12 +50,12 @@ app.post("/", async (req, res) => {
       .slice(0, len);
   let name = req.body["name"];
   let input = req.body["input"];
-  if (input == undefined) {
+  if (input == undefined || input == "") {
     res.status(400).send("needs to have some input.");
     return;
   }
   let doc;
-  if (name == undefined) {
+  if (name == undefined || name == "") {
     do {
       name = hashed();
       len++;
