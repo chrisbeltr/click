@@ -35,7 +35,8 @@ additionally, you can pass in a few query parameters to customize the colors of 
   - e.g. [`https://qr.borks.click/64vfpZ?preset=random`](https://qr.borks.click/64vfpZ?preset=random)
 
 finally, there's a niche feature that i don't forsee anyone using.  
-if you happen to be using OpenNIC DNS servers, i've set up the [`http://brks.o/`](http://brks.o/) domain as an alias. there is nothing different about it, except that it cannot automatically copy links to your clipboard.
+if you happen to be using OpenNIC DNS servers, i've set up the [`http://brks.o/`](http://brks.o/) domain as an alias. there is nothing different about it, except that it cannot automatically copy links to your clipboard.  
+(if you're interested in learning more, check out [OpenNIC's website](https://borks.click/1ljVSU) and these [helpful DNS wizard links on their wiki](https://borks.click/1Zkhnm))
 
 ## where
 
