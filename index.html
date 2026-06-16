@@ -8,10 +8,33 @@
     />
     <title>borks link shortener™</title>
     <style>
+      @font-face {
+        font-family: Ari;
+        src: url(assets/fonts/ari-w9500-display.ttf);
+      }
+
       *,
       *::after,
       *::before {
         box-sizing: border-box;
+      }
+
+      h1,
+      p,
+      ul {
+        margin: 7px 0;
+      }
+
+      a {
+        color: white;
+      }
+
+      .pixel {
+        image-rendering: pixelated;
+      }
+      .graphic {
+        user-select: none;
+        pointer-events: none;
       }
 
       html {
@@ -22,26 +45,62 @@
         height: 100%;
         margin: 0;
         padding: 7px;
-        background-color: #bbe4f9;
+        overflow: hidden;
+
         display: flex;
         flex-direction: column;
-        align-items: center;
+        justify-content: center;
+        align-items: flex-start;
+
+        background-image: url(assets/img/bg.png);
+        font-family: Ari, monospace;
       }
 
       .page {
+        position: relative;
         height: 100%;
+        width: 100%;
+        max-height: 650px;
+        max-width: 800px;
+        padding: 7px;
+
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        border: 1px solid black;
-        padding: 7px;
-        max-width: 800px;
+
+        color: #c5c5c5;
+        background-color: #535353;
       }
-      
-      h1,
-      p {
-        margin: 7px 0;
+
+      .container {
+        overflow: hidden;
+        width: 100%;
+        max-height: calc(100% - 20px);
+        overflow: hidden;
+
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+
+      .container-content {
+        overflow: hidden;
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+
+      .form,
+      .info {
+        min-width: 300px;
+      }
+
+      .form {
+        flex: 1 0 0;
+        display: flex;
+        flex-direction: column;
       }
 
       form {
@@ -54,9 +113,87 @@
         font-weight: bold;
       }
 
-      input[type="submit"] {
+      .info {
+        z-index: 2;
+        max-height: 100%;
+        overflow: hidden;
+        position: relative;
+
+        flex: 2 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+
+        background-color: #535353;
+      }
+
+      .info-buttons {
+        display: flex;
+        gap: 3px;
+      }
+
+      .button {
+        width: 64px;
+        height: 18px;
+        border: none;
+        cursor: pointer;
+      }
+      #what {
+        background-image: url(./assets/img/buttons1.png);
+      }
+      #what:hover,
+      #what.selected {
+        background-image: url(./assets/img/buttons-active1.png);
+      }
+      #why {
+        background-image: url(./assets/img/buttons2.png);
+      }
+      #why:hover,
+      #why.selected {
+        background-image: url(./assets/img/buttons-active2.png);
+      }
+      #how {
+        background-image: url(./assets/img/buttons3.png);
+      }
+      #how:hover,
+      #how.selected {
+        background-image: url(./assets/img/buttons-active3.png);
+      }
+      #where {
+        background-image: url(./assets/img/buttons4.png);
+      }
+      #where:hover,
+      #where.selected {
+        background-image: url(./assets/img/buttons-active4.png);
+      }
+      #submit {
         align-self: center;
-        padding: 3px 7px;
+        background-image: url(./assets/img/submit.png);
+      }
+      #submit:hover {
+        background-image: url(./assets/img/submit-active.png);
+      }
+
+      .info-text {
+        overflow: auto;
+      }
+
+      /* vertical layout */
+      @media (width <= 700px) {
+        .container-content {
+          flex-direction: column;
+          align-items: initial;
+          flex-wrap: initial;
+        }
+
+        .form,
+        .info {
+          flex: initial;
+        }
+
+        .hide {
+          display: none;
+        }
       }
     </style>
   </head>
@@ -64,76 +201,240 @@
     <div class="page">
       <div class="container">
         <h1>borks.click</h1>
-        <p>
-          want to shorten a link? want to store some text? go ahead, put it in
-          the textbox below, and we'll give you back a link you can share!
-          please don't put anything important or personal in here. or do, i
-          can't stop you :3
-        </p>
-        <form id="form" action="">
-          <label for="name">custom link name</label>
-          <input
-            type="text"
-            name="name"
-            id="name"
-            placeholder="6 or more, no spaces/symbols, blank for random"
-            minlength="6"
-            autofocus
-          />
-          <label for="input">link/text</label>
-          <input
-            type="text"
-            name="input"
-            id="input"
-            placeholder="links must start with http(s)://"
-            required
-          />
-          <input type="submit" value="submit" />
-        </form>
-        <span id="response"></span>
+        <div class="container-content">
+          <div class="form">
+            <form id="form" action="">
+              <label for="name">custom link name</label>
+              <input
+                type="text"
+                name="name"
+                id="name"
+                placeholder="6 or more, no spaces/symbols, blank for random"
+                minlength="6"
+                autofocus
+              />
+              <label for="input">link/text</label>
+              <input
+                type="text"
+                name="input"
+                id="input"
+                placeholder="links must start with http(s)://"
+                required
+              />
+              <input class="pixel button" type="submit" value="" id="submit" />
+            </form>
+            <span id="response"></span>
+          </div>
+          <div class="info">
+            <div class="info-buttons">
+              <button class="pixel button" id="what"></button>
+              <button class="pixel button" id="why"></button>
+              <button class="pixel button" id="how"></button>
+              <button class="pixel button" id="where"></button>
+            </div>
+            <div class="info-text">click a button to find out more.</div>
+          </div>
+        </div>
       </div>
       <footer>
         made with love by <a href="https://borks.click/2940qU">borks</a> |
         <a href="https://borks.click/4J0aZh">github</a>
       </footer>
+      <script>
+        let form = document.getElementById("form");
+        let input = document.getElementById("input");
+        let name = document.getElementById("name");
+        let response = document.getElementById("response");
+        form.addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+
+          let data = new FormData(form);
+          let url = data.get("input");
+          if (url.length > 2000) {
+            response.innerHTML = "input was too large!";
+            return;
+          }
+          let custom = data.get("name");
+
+          input.disabled = true;
+          name.disabled = true;
+
+          let res = await fetch("./", {
+            method: "POST",
+            body: JSON.stringify({ input: url, name: custom }),
+            headers: { "Content-Type": "application/json" },
+          });
+          let output = await res.text();
+          input.disabled = false;
+          name.disabled = false;
+          if (res.status != 200 && res.status != 302) {
+            if (output) response.innerHTML = output;
+            else response.innerHTML = `${res.status}: ${res.statusText}`;
+            return;
+          }
+          form.reset();
+          response.innerHTML = `your new link: <a href="${output}" target="_blank">${output}</a>!`;
+          try {
+            await navigator.clipboard.writeText(output);
+            response.innerHTML += " it has been copied to your clipboard.";
+          } catch {}
+        });
+
+        let what = document.getElementById("what");
+        let why = document.getElementById("why");
+        let how = document.getElementById("how");
+        let where = document.getElementById("where");
+        let textbox = document.querySelector(".info-text");
+        what.addEventListener("click", () => {
+          what.classList.add("selected");
+          why.classList.remove("selected");
+          how.classList.remove("selected");
+          where.classList.remove("selected");
+
+          textbox.textContent =
+            "want to shorten a link? want to store some text? go ahead, put it in the textbox below, and we'll give you back a link you can share! please don't put anything important or personal in here. or do, i can't stop you :3";
+        });
+        why.addEventListener("click", () => {
+          what.classList.remove("selected");
+          why.classList.add("selected");
+          how.classList.remove("selected");
+          where.classList.remove("selected");
+
+          textbox.textContent =
+            "i think making a link shortener was a great idea for a first backend development project. it taught me a lot about web server hosting, cloud services, and databases. it's also just something that i will likely find myself using here and there.";
+        });
+        how.addEventListener("click", () => {
+          what.classList.remove("selected");
+          why.classList.remove("selected");
+          how.classList.add("selected");
+          where.classList.remove("selected");
+
+          textbox.innerHTML = `<p>the main feature, of course, is the link shortener at borks.click. here, you can shorten links and store text.<br>
+after the form is submitted, if there was no error, you will get a new (hopefully shorter) link to use. it will be automatically copied to your clipboard.<br>
+if the form input starts with http(s), it will be treated as a link. otherwise, it will be treated as normal text.<br>
+you can also give your link a custom name, as long as it's not taken. this will be what comes after the main link (e.g. <a href="https://borks.click/customlink" target="_blank">https://borks.click/customlink</a>).<br>
+<br>
+you can put qr. in front of any borks.click link (https://qr.borks.click/...) in order to generate a qr code for said link.<br>
+normally, sending a GET request to a qr.borks.click/... link (e.g. navigating to it in a browser) will give you a png of a qr code. this image is automatically embedded on services like discord.<br>
+if you send a GET request to a qr.borks.click/... link with the Prefer header set to terminal (e.g. curl -H "Prefer: terminal" -L <a href="https://qr.borks.click/1UCxsd" target="_blank">https://qr.borks.click/1UCxsd</a>), the output will be an ascii qr code.<br>
+additionally, you can pass in a few query parameters to customize the colors of the qr code:
+<ul>
+  <li>dark, light</li>
+  <ul>
+    <li>hex codes for the dark and light colors of the qr code</li>
+    <li>format: RRGGBBAA (red, green, blue, and alpha)</li>
+    <li>if you specify one, you need to specify the other</li>
+    <li>e.g. <a href="https://qr.borks.click/3IRccn?dark=013f80ff&light=b8e548ff" target="_blank">https://qr.borks.click/3IRccn?dark=013f80ff&light=b8e548ff</a></li>
+  </ul>
+  <li>preset</li>
+  <ul>
+    <li>default: dark: <span style="color: #000000ff;">#000000ff</span>, light: <span style="color: #ffffffff;">#ffffffff</span></li>
+    <li>light: dark: <span style="color: #bbe4f9ff;">#bbe4f9ff</span>, light: <span style="color: #ffffffff">#ffffffff</span></li>
+    <li>dark: dark: <span style="color: #000000ff;">#000000ff</span>, light: <span style="color: #454647ff; background-color: white;">#454647ff</span></li>
+    <li>borks: dark: <span style="color: #ac6962ff;">#ac6962ff</span>, light: <span style="color: #ffe482ff;">#ffe482ff</span></li>
+    <li>fall: dark: <span style="color: #450222ff">#450222ff</span>, light: <span style="color: #977bb7ff;">#977bb7ff</span></li>
+    <li>random: chooses one of the previous presets at random</li>
+    <li>e.g. <a href="https://qr.borks.click/64vfpZ?preset=random" target="_blank">https://qr.borks.click/64vfpZ?preset=random</a></li>
+  </ul>
+</ul>
+finally, there's a niche feature that i don't foresee anyone using.<br>
+if you happen to be using OpenNIC DNS servers, i've set up the <a href="http://brks.o/" target="_blank">http://brks.o/</a> domain as an alias. there is nothing different about it, except that it cannot automatically copy links to your clipboard.<br>
+(if you're interested in learning more, check out OpenNIC's website and their wiki)</p>`;
+        });
+        where.addEventListener("click", () => {
+          what.classList.remove("selected");
+          why.classList.remove("selected");
+          how.classList.remove("selected");
+          where.classList.add("selected");
+
+          textbox.textContent = "i'm hosting this project on a home server i run myself, managing the routing with caddy. i'm using google cloud firestore for my database and was previously using google cloud compute to host as well. i'm using simple node.js for the backend and vanilla html css js for the frontend.";
+        });
+      </script>
+      <!-- decorations -->
+      <div
+        class="pixel graphic"
+        style="
+          background-image: url(assets/img/grid.png);
+          width: 50px;
+          height: 150px;
+          position: absolute;
+          bottom: -56px;
+          left: -20px;
+          z-index: 1;
+        "
+      ></div>
+      <div
+        class="pixel graphic"
+        style="
+          background-image: url(assets/img/tris.png);
+          width: 10px;
+          height: 160px;
+          position: absolute;
+          bottom: -117px;
+          left: 475px;
+          z-index: -1;
+        "
+      ></div>
+      <div
+        class="pixel graphic"
+        style="
+          background-image: url(assets/img/stripe.png);
+          width: 50px;
+          height: 200px;
+          position: absolute;
+          top: 200px;
+          right: -40px;
+          z-index: 1;
+        "
+      ></div>
+      <div
+        class="pixel graphic"
+        style="
+          background-image: url(assets/img/rect.png);
+          width: 64px;
+          height: 700px;
+          position: absolute;
+          bottom: -40px;
+          left: 100px;
+          z-index: -1;
+        "
+      ></div>
+      <div
+        class="pixel graphic hide"
+        style="
+          background-image: url(assets/img/right.png);
+          width: 200px;
+          height: 20px;
+          position: absolute;
+          top: -10px;
+          left: 200px;
+          z-index: 1;
+        "
+      ></div>
+      <div
+        class="pixel graphic"
+        style="
+          background-image: url(assets/img/right.png);
+          width: 125px;
+          height: 20px;
+          position: absolute;
+          bottom: -15px;
+          right: -83px;
+          z-index: 1;
+        "
+      ></div>
+      <img
+        class="pixel graphic"
+        src="assets/img/bar1.png"
+        alt="qI181IdI%O8Ib\1/Iq1p%0//IobodIoq%\\I8P"
+        style="position: absolute; top: 0; right: 0; z-index: 1"
+      />
+      <img
+        class="pixel graphic"
+        src="assets/img/bar2.png"
+        alt="0//8qIdb\\0oO//d0OpIbo01bIppI1"
+        style="position: absolute; bottom: 100px; right: -75px; z-index: 1"
+      />
     </div>
-    <script>
-      let form = document.getElementById("form");
-      let input = document.getElementById("input");
-      let name = document.getElementById("name");
-      let response = document.getElementById("response");
-      form.addEventListener("submit", async (ev) => {
-        ev.preventDefault();
-
-        let data = new FormData(form);
-        let url = data.get("input");
-        if (url.length > 2000) {
-          response.innerHTML = "input was too large!";
-          return;
-        }
-        let custom = data.get("name");
-
-        input.disabled = true;
-        name.disabled = true;
-
-        let res = await fetch("./", { method: "POST", body: JSON.stringify({ input: url, name: custom }), headers: {"Content-Type": "application/json" } });
-        let output = await res.text();
-        input.disabled = false;
-        name.disabled = false;
-        if (res.status != 200 && res.status != 302) {
-          if (output)
-            response.innerHTML = output;
-          else
-            response.innerHTML = `${res.status}: ${res.statusText}`
-          return;
-        }
-        form.reset();
-        response.innerHTML = `your new link: <a href="${output}" target="_blank">${output}</a>!`;
-        try {
-          await navigator.clipboard.writeText(output)
-          response.innerHTML += " it has been copied to your clipboard."
-        } catch {}
-      });
-    </script>
   </body>
 </html>
