@@ -28,6 +28,19 @@ services:
       - backend
     command: ["node", "qr.js"]
 
+  cdn:
+    image: click-node:latest
+    pull_policy: build
+    stop_grace_period: 1s
+    container_name: cdn
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    env_file: .env
+    networks:
+      - backend
+    command: ["node", "cdn.js"]
+
   caddy:
     build:
       context: .
@@ -38,6 +51,7 @@ services:
     depends_on:
       - click
       - qr
+      - cdn
     ports:
       - "80:80"
       - "443:443/tcp"

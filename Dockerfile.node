@@ -6,4 +6,5 @@ COPY package*.json ./
 
 RUN npm install
 
-COPY main.js qr.js index.html key.json ./
+COPY main.js qr.js cdn.js index.html key.json ./
+COPY assets/ ./assets/

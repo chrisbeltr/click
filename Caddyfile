@@ -23,10 +23,22 @@ qr.borks.click {
 	import clicktls {$PORKBUN_API_KEY} {$PORKBUN_SECRET_KEY}
 }
 
+cdn.borks.click {
+	reverse_proxy http://cdn:3002
+
+	header Access-Control-Allow-Origin *
+
+	import clicktls {$PORKBUN_API_KEY} {$PORKBUN_SECRET_KEY}
+}
+
 http://brks.o {
 	reverse_proxy http://click:3000
 }
 
 http://qr.brks.o {
 	reverse_proxy http://qr:3001
+}
+
+http://cdn.brks.o {
+	reverse_proxy http://cdn:3002
 }
