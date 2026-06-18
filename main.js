@@ -49,7 +49,7 @@ app.post("/", async (req, res) => {
       )
       .slice(0, len);
   let name = req.body["name"];
-  let input = req.body["input"];
+  let input = req.body["input"].trim();
   if (input == undefined || input == "") {
     res.status(400).send("needs to have some input.");
     return;
