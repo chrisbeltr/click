@@ -46,25 +46,24 @@ services:
       context: .
       dockerfile: Dockerfile.caddy
     pull_policy: build
-    container_name: caddy
+    container_name: caddy-click
     restart: unless-stopped
     depends_on:
       - click
       - qr
       - cdn
-    ports:
-      - "80:80"
-      - "443:443/tcp"
-      - "443:443/udp"
     env_file: .env
     networks:
       - backend
+      - gateway-network
     volumes:
       - caddy_data:/data
 
 networks:
   backend:
     driver: bridge
+  gateway-network:
+    external: true
 
 volumes:
   caddy_data:
