@@ -23,7 +23,7 @@ async function get(id) {
 const link_reg = new RE2(
   "^https?:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,})|([0-9]{1,3}(\.[0-9]{1,3}){3}))(:[0-9]{1,5})?(\/[-a-zA-Z0-9@%_+~#?&\/= ]*)*$",
 );
-const valid_name = new RE2("^[0-9a-zA-Z]{6,}$");
+const valid_name = new RE2("^[0-9a-zA-Z\.]{6,}$");
 
 let app = express();
 app.set("case sensitive routing", true);
