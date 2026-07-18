@@ -9,6 +9,5 @@ COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 WORKDIR /caddy
 
 COPY Caddyfile ./
-COPY cert/ ./cert/
 
 CMD ["caddy", "run"]

@@ -8,7 +8,7 @@
 		}
 	}
 
-	tls ./cert/domain.cert.pem ./cert/private.key.pem
+	# tls ./cert/domain.cert.pem ./cert/private.key.pem
 }
 
 borks.click {
