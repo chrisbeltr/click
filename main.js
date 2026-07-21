@@ -49,9 +49,18 @@ app.post("/", async (req, res) => {
       )
       .slice(0, len);
   let name = req.body["name"];
-  let input = req.body["input"].trim();
+  let input = "";
+  if (req.body["input"]) input = req.body["input"].trim();
   if (input == undefined || input == "") {
     res.status(400).send("needs to have some input.");
+    return;
+  }
+  if (input.length > 2000) {
+    res.status(400).send("input is too large.");
+    return;
+  }
+  if (name.length > 2000) {
+    res.status(400).send("name is too large.");
     return;
   }
   let doc;

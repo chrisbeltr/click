@@ -255,6 +255,10 @@
             return;
           }
           let custom = data.get("name");
+          if (custom.length > 2000) {
+            response.innerHTML = "name was too large!";
+            return;
+          }
 
           input.disabled = true;
           name.disabled = true;
